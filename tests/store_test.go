@@ -57,14 +57,12 @@ func TestStoreConnection(t *testing.T){
 			signin_key := os.Getenv("SIGNIN_KEY")
 			cert := os.Getenv("CERT")
 
-			fmt.Println("SIGNIN_KEY FORM ENV VARIABLE: "+ signin_key)
 			tokenString, err := tc.token.SignedString([]byte(signin_key))
 			if err != nil {
 				t.Fatalf("Error creating the token")
 			}
 
 			authCreds := Creds{Token: tokenString}
-			fmt.Println("CERT FORM ENV VARIABLE: "+ cert)
 			creds, _ := credentials.NewClientTLSFromFile(cert, "")
 
 			dialOpts := []grpc.DialOption{

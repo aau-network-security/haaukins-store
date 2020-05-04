@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -150,10 +151,34 @@ func (s server) GetGRPCServer(opts ...grpc.ServerOption) *grpc.Server {
 	return grpc.NewServer(opts...)
 }
 
+func readContent(path string) error {
+	cont, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	_, err = io.Copy(os.Stdout, cont)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
 func main() {
 	store, err := database.NewStore()
+	certificate := os.Getenv("CERT")
+	certificateKey:=  os.Getenv("CERT_KEY")
+
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
+	}
+
+	if err := readContent(certificate); err !=nil {
+		log.Fatalf(err.Error())
+	}
+	if err:= readContent(certificateKey); err !=nil {
+		log.Fatalf(err.Error())
 	}
 
 	tls := true
@@ -166,9 +191,10 @@ func main() {
 		store:		store,
 		auth: 		NewAuthenticator(os.Getenv("SIGNIN_KEY")),
 		tls: 		tls,
-		cert:   	os.Getenv("CERT"),
-		certKey:    os.Getenv("CERT_KEY"),
+		cert:   	certificate,
+		certKey:    certificateKey
 	}
+
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
