@@ -11,7 +11,9 @@ jobs:
         # pulling docker hub
         image: postgres:latest # same with the one which is written on docker-compose
         env:
-          POSTGRES_PASSWORD: test-step
+          POSTGRES_PASSWORD: dummy-password
+          POSTGRES_USER: dummy-user
+          POSTGRES_DB: dummy-db
             # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
