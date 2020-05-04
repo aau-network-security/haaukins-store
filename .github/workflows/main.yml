@@ -48,8 +48,8 @@ jobs:
         env:
           SSL_OFF: false  # which means ssl enabled
           AUTH_KEY: random-key
-          CERT: ./tests/localhost/localhost.crt
-          CERT_KEY: ./tests/localhost/localhost.key
+          CERT: ./tests/certs/localhost.crt
+          CERT_KEY: ./tests/certs/localhost.key
           SIGNIN_KEY: random-signin-key
           DATABASE_HOST: localhost
           DB_PORT: 5432
