@@ -4,6 +4,24 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+
+      postgres:
+        # pulling docker hub
+        image: postgres:latest # same with the one which is written on docker-compose
+        env:
+          POSTGRES_PASSWORD: test-step
+            # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
     steps:
       - name: Set up Go 1.14
         uses: actions/setup-go@v1
@@ -25,11 +43,15 @@ jobs:
           chmod +x ./server
           ./server &
           go test ./tests
-
         env:
           SSL_OFF: true
-          CERT: ./certs/server.crt
-          CERT_KEY: ./certs/server.key
+          CERT: ./tests/localhost/localhost.crt
+          CERT_KEY: ./tests/localhost/localhost.key
           SIGNIN_KEY: random-signin-key
+          DATABASE_HOST: localhost
+          DB_PORT: 5432
+          POSTGRES_USER: dummy-user
+          POSTGRES_PASSWORD: dummy-password
+          POSTGRES_DB: dummy-db
 
 

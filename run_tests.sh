@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 # Start the server in background
 ./server &
 
