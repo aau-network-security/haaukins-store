@@ -40,7 +40,7 @@ func TestStoreConnection(t *testing.T){
 	})
 
 	tokenError := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		AUTH_KEY: "c41ec030-db75-473f-a504-5a7323aa143a",
+		AUTH_KEY: "random-key",
 	})
 
 	tt := []struct{
