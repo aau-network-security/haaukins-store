@@ -192,7 +192,7 @@ func main() {
 		auth: 		NewAuthenticator(os.Getenv("SIGNIN_KEY")),
 		tls: 		tls,
 		cert:   	certificate,
-		certKey:    certificateKey
+		certKey:    certificateKey,
 	}
 
 
