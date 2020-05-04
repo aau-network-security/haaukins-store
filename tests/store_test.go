@@ -40,7 +40,7 @@ func TestStoreConnection(t *testing.T){
 	})
 
 	tokenError := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		AUTH_KEY: "random-key",
+		AUTH_KEY: "wrong-token",
 	})
 
 	tt := []struct{
@@ -54,14 +54,18 @@ func TestStoreConnection(t *testing.T){
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
+			signin_key := os.Getenv("SIGNIN_KEY")
+			cert := os.Getenv("CERT")
 
-			tokenString, err := tc.token.SignedString([]byte(os.Getenv("SIGNIN_KEY")))
+			fmt.Println("SIGNIN_KEY FORM ENV VARIABLE: "+ signin_key)
+			tokenString, err := tc.token.SignedString([]byte(signin_key))
 			if err != nil {
 				t.Fatalf("Error creating the token")
 			}
 
 			authCreds := Creds{Token: tokenString}
-			creds, _ := credentials.NewClientTLSFromFile(os.Getenv("CERT"), "")
+			fmt.Println("CERT FORM ENV VARIABLE: "+ cert)
+			creds, _ := credentials.NewClientTLSFromFile(cert, "")
 
 			dialOpts := []grpc.DialOption{
 				grpc.WithTransportCredentials(creds),
