@@ -165,7 +165,8 @@ func readContent(path string) error {
 	return nil
 }
 
-func main() {
+func InitilizegRPCServer()*server {
+
 	store, err := database.NewStore()
 	certificate := os.Getenv("CERT")
 	certificateKey:=  os.Getenv("CERT_KEY")
@@ -195,7 +196,12 @@ func main() {
 		certKey:    certificateKey,
 	}
 
+	return s
+}
 
+func main() {
+
+	s := InitilizegRPCServer()
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -212,7 +218,5 @@ func main() {
 	if err := gRPCServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-
-
 
 }

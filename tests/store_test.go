@@ -4,12 +4,16 @@ import (
 	"context"
 	"fmt"
 	pb "github.com/aau-network-security/haaukins-store/proto"
+	server "github.com/aau-network-security/haaukins-store"
 	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
-	"testing"
+	"google.golang.org/grpc/test/bufconn"
+	"log"
+	"net"
 	"os"
+	"testing"
 )
 
 const (
@@ -20,6 +24,25 @@ type Creds struct {
 	Token    string
 	Insecure bool
 }
+
+const bufSize = 1024 * 1024
+
+var lis *bufconn.Listener
+func init() {
+	lis = bufconn.Listen(bufSize)
+	s := grpc.NewServer()
+	pb.RegisterStoreServer(s,server.InitilizegRPCServer())
+	go func() {
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("Server exited with error: %v", err)
+		}
+	}()
+}
+
+func bufDialer(context.Context, string) (net.Conn, error) {
+	return lis.Dial()
+}
+
 
 func (c Creds) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
 	return map[string]string{
@@ -66,10 +89,11 @@ func TestStoreConnection(t *testing.T){
 			creds, _ := credentials.NewClientTLSFromFile(cert, "")
 
 			dialOpts := []grpc.DialOption{
+				grpc.WithContextDialer(bufDialer),
 				grpc.WithTransportCredentials(creds),
 				grpc.WithPerRPCCredentials(authCreds),
 			}
-			conn, err := grpc.Dial(address, dialOpts...)
+			conn, err := grpc.DialContext(context.Background(),"bufnet", dialOpts...)
 			if err != nil {
 				t.Fatalf("Connection error: %v", err)
 			}
