@@ -9,6 +9,10 @@ import (
 	"net"
 )
 
+const (
+	port = ":50051"
+)
+
 func main() {
 
 	s := rpc.InitilizegRPCServer()
