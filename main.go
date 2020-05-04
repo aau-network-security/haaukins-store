@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	pb "github.com/aau-network-security/haaukins-store/proto"
 	rpc "github.com/aau-network-security/haaukins-store/grpc"
+	pb "github.com/aau-network-security/haaukins-store/proto"
 	_ "github.com/lib/pq"
 	"log"
 	"net"

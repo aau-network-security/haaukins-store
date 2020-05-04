@@ -3,8 +3,8 @@ package tests
 import (
 	"context"
 	"fmt"
-	pb "github.com/aau-network-security/haaukins-store/proto"
 	rpc "github.com/aau-network-security/haaukins-store/grpc"
+	pb "github.com/aau-network-security/haaukins-store/proto"
 	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -55,8 +55,6 @@ func (c Creds) RequireTransportSecurity() bool {
 }
 
 func TestStoreConnection(t *testing.T){
-
-	address := os.Getenv("HOST")
 
 	tokenCorret := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		AUTH_KEY: os.Getenv("AUTH_KEY"),
