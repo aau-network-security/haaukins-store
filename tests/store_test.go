@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	pb "github.com/aau-network-security/haaukins-store/proto"
-	server "github.com/aau-network-security/haaukins-store"
+	rpc "github.com/aau-network-security/haaukins-store/grpc"
 	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -31,7 +31,7 @@ var lis *bufconn.Listener
 func init() {
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
-	pb.RegisterStoreServer(s,server.InitilizegRPCServer())
+	pb.RegisterStoreServer(s,rpc.InitilizegRPCServer())
 	go func() {
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("Server exited with error: %v", err)
