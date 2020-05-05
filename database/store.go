@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"github.com/aau-network-security/haaukins-store/model"
 	pb "github.com/aau-network-security/haaukins-store/proto"
+	_ "github.com/lib/pq"
 	"log"
+	"os"
 	"strconv"
 	"sync"
 	"time"
-	"os"
 )
 
 var (

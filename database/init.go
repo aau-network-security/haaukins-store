@@ -1,6 +1,8 @@
 package database
 
-import "database/sql"
+import ("database/sql"
+	_ "github.com/lib/pq")
+
 
 func InitTables(db *sql.DB) error{
 
