@@ -49,7 +49,7 @@ func setup() (*sql.DB, error) {
 
 func insertTeamEvent(eid int, db *sql.DB) error {
 
-	_, err := db.Exec(AddTeamQuery, "", eid, "random@email.com", "randomteam", "12345", time.Now(), time.Now(), "[]")
+	_, err := db.Exec(AddTeamQuery, "", eid, "random@email.com", "randomteam", "12345", time.Now(), time.Now(), 0, "[]", "[]")
 	if err != nil {
 		return err
 	}

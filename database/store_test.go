@@ -301,6 +301,24 @@ func TestTeamUpdateLastAccess(t *testing.T) {
 	}
 }
 
+func TestTeamUpdateStep(t *testing.T) {
+
+	conn, err := createTestClientConn()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	c := pb.NewStoreClient(conn)
+
+	_, err = c.UpdateTeamStepTracker(context.Background(), &pb.UpdateTeamStepTrackerRequest{
+		TeamId: "team1",
+		Step:   1,
+	})
+	if err != nil {
+		t.Fatalf("Error updating team step: %s", err.Error())
+	}
+}
+
 func TestCloseEvent(t *testing.T) {
 
 	conn, err := createTestClientConn()

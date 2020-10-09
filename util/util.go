@@ -146,13 +146,15 @@ func (s server) GetEventTeams(ctx context.Context, in *pb.GetEventTeamsRequest) 
 	var teams []*pb.GetEventTeamsResponse_Teams
 	for _, t := range result {
 		teams = append(teams, &pb.GetEventTeamsResponse_Teams{
-			Id:               t.Tag,
-			Email:            t.Email,
-			Name:             t.Name,
-			HashPassword:     t.Password,
-			CreatedAt:        t.CreatedAt,
-			LastAccess:       t.LastAccess,
-			SolvedChallenges: t.SolvedChallenges,
+			Id:                t.Tag,
+			Email:             t.Email,
+			Name:              t.Name,
+			HashPassword:      t.Password,
+			CreatedAt:         t.CreatedAt,
+			LastAccess:        t.LastAccess,
+			SolvedChallenges:  t.SolvedChallenges,
+			SkippedChallenges: t.SkippedChallenges,
+			Step:              int32(t.Step),
 		})
 	}
 	log.Printf("Get Teams for the Event %s", in.EventTag)
@@ -176,6 +178,25 @@ func (s server) UpdateTeamSolvedChallenge(ctx context.Context, in *pb.UpdateTeam
 		return &pb.UpdateResponse{ErrorMessage: err.Error()}, nil
 	}
 	log.Printf("Team %s solved %s challenge", in.TeamId, in.Tag)
+	return &pb.UpdateResponse{Message: result}, nil
+}
+
+func (s server) UpdateTeamSkippedChallenge(ctx context.Context, in *pb.UpdateTeamSkippedChallengeRequest) (*pb.UpdateResponse, error) {
+	result, err := s.store.UpdateTeamSkippedChallenge(in)
+	if err != nil {
+		log.Printf("ERR: Error Update team %s skipped challenge: %s", in.TeamId, err.Error())
+		return &pb.UpdateResponse{ErrorMessage: err.Error()}, nil
+	}
+	log.Printf("Team %s skipped/resume %s challenge", in.TeamId, in.SkippedChals)
+	return &pb.UpdateResponse{Message: result}, nil
+}
+
+func (s server) UpdateTeamStepTracker(ctx context.Context, in *pb.UpdateTeamStepTrackerRequest) (*pb.UpdateResponse, error) {
+	result, err := s.store.UpdateTeamStep(in)
+	if err != nil {
+		log.Printf("ERR: Error Update team %s step: %s", in.TeamId, err.Error())
+		return &pb.UpdateResponse{ErrorMessage: err.Error()}, nil
+	}
 	return &pb.UpdateResponse{Message: result}, nil
 }
 

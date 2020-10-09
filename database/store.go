@@ -46,6 +46,8 @@ type Store interface {
 	GetEventStatus(*pb.GetEventStatusRequest) (int32, error)
 	SetEventStatus(*pb.SetEventStatusRequest) (int32, error)
 	UpdateTeamSolvedChallenge(*pb.UpdateTeamSolvedChallengeRequest) (string, error)
+	UpdateTeamSkippedChallenge(request *pb.UpdateTeamSkippedChallengeRequest) (string, error)
+	UpdateTeamStep(request *pb.UpdateTeamStepTrackerRequest) (string, error)
 	UpdateTeamLastAccess(*pb.UpdateTeamLastAccessRequest) (string, error)
 	UpdateCloseEvent(*pb.UpdateEventRequest) (string, error)
 }
@@ -110,7 +112,7 @@ func (s *store) AddTeam(in *pb.AddTeamRequest) (string, error) {
 		return "", err
 	}
 
-	_, err := s.db.Exec(AddTeamQuery, in.Id, eventId, in.Email, in.Name, in.Password, now, now, "[]")
+	_, err := s.db.Exec(AddTeamQuery, in.Id, eventId, in.Email, in.Name, in.Password, now, now, 0, "[]", "[]")
 	if err != nil {
 		return "", err
 	}
@@ -183,7 +185,7 @@ func (s *store) GetTeams(tag string) ([]model.Team, error) {
 
 		team := new(model.Team)
 		err := rows.Scan(&team.Id, &team.Tag, &team.EventId, &team.Email, &team.Name, &team.Password, &team.CreatedAt,
-			&team.LastAccess, &team.SolvedChallenges)
+			&team.LastAccess, &team.Step, &team.SkippedChallenges, &team.SolvedChallenges)
 		if err != nil && !strings.Contains(err.Error(), handleNullConversionError) {
 			return nil, err
 		}
@@ -236,6 +238,29 @@ func (s *store) UpdateTeamSolvedChallenge(in *pb.UpdateTeamSolvedChallengeReques
 	newSolvedChallengesDB, _ := json.Marshal(solvedChallenges)
 
 	_, err := s.db.Exec(UpdateTeamSolvedChl, in.TeamId, string(newSolvedChallengesDB))
+	if err != nil {
+		return "", err
+	}
+
+	return OK, nil
+}
+
+func (s *store) UpdateTeamSkippedChallenge(in *pb.UpdateTeamSkippedChallengeRequest) (string, error) {
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	_, err := s.db.Exec(UpdateTeamSkippedChl, in.TeamId, in.SkippedChals)
+	if err != nil {
+		return "", err
+	}
+	return OK, nil
+}
+
+func (s *store) UpdateTeamStep(in *pb.UpdateTeamStepTrackerRequest) (string, error) {
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	_, err := s.db.Exec(UpdateTeamStep, in.TeamId, in.Step)
 	if err != nil {
 		return "", err
 	}
