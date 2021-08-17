@@ -14,7 +14,7 @@ var (
 		"finish_expected timestamp, " +
 		"finished_at timestamp," +
 		"createdBy text," +
-		"onlyVPN boolean," +
+		"onlyVPN integer," +
 		"secretKey text," +
 		"disabledExercises text);"
 

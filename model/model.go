@@ -13,7 +13,7 @@ type Event struct {
 	ExpectedFinishTime string
 	FinishedAt         string
 	CreatedBy          string
-	OnlyVPN            bool
+	OnlyVPN            int32
 	SecretKey          string
 	DisabledExercises  string
 }
