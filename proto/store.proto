@@ -128,7 +128,7 @@ message AddEventRequest{
     string finishedAt = 9;
     int32 status = 10;
     string createdBy = 11;
-    bool onlyVPN = 12;
+    int32 onlyVPN = 12;
     string secretKey = 13;
     string disabledExercises = 14;
 }
@@ -159,7 +159,7 @@ message GetEventResponse{
         string finishedAt = 9;
         int32 status = 10;
         string createdBy =11;
-        bool onlyVPN = 12;
+        int32 onlyVPN = 12;  // 0 browser // 1 VPN 2 // VPN + Browser
         string secretKey = 13;
         string disabledExercises = 14;
     }
