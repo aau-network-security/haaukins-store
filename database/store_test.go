@@ -213,7 +213,7 @@ func TestAddEvent(t *testing.T) {
 		Status:             1,
 		ExpectedFinishTime: "2020-05-21 14:35:01",
 		FinishedAt:         "0001-01-01 00:00:00", // it means that event is not finished yet
-		OnlyVPN:            false,
+		OnlyVPN:            0,
 		SecretKey:          "",
 		DisabledExercises:  "",
 	}
@@ -342,7 +342,7 @@ func TestMultipleEventWithSameTag(t *testing.T) {
 		Capacity:           2,
 		StartTime:          "2020-06-20 14:35:01",
 		ExpectedFinishTime: "2020-06-21 14:35:01",
-		OnlyVPN:            false,
+		OnlyVPN:            0,
 		SecretKey:          "",
 		DisabledExercises:  "",
 	}
