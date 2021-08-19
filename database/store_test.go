@@ -6,8 +6,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -24,12 +22,6 @@ const (
 	AUTH_KEY_VALUE = "authkey"
 	SIGNIN_VALUE   = "signkey"
 	HOST           = "localhost:50051"
-)
-
-var (
-	testCertPath    = os.Getenv("CERT")
-	testCertKeyPath = os.Getenv("CERT_KEY")
-	testCAPath      = os.Getenv("CA")
 )
 
 type Creds struct {
@@ -75,35 +67,17 @@ func TestStoreConnection(t *testing.T) {
 
 			authCreds := Creds{Token: tokenString}
 
-			// Load the client certificates from disk
-			certificate, err := tls.LoadX509KeyPair(testCertPath, testCertKeyPath)
-			if err != nil {
-				t.Fatalf("could not load client key pair: %s", err)
-			}
+			pool, _ := x509.SystemCertPool()
+			creds := credentials.NewClientTLSFromCert(pool, "")
 
-			// Create a certificate pool from the certificate authority
-			certPool := x509.NewCertPool()
-			ca, err := ioutil.ReadFile(testCAPath)
-			if err != nil {
-				t.Fatalf("could not read ca certificate: %s", err)
-			}
-
-			// Append the certificates from the CA
-			if ok := certPool.AppendCertsFromPEM(ca); !ok {
-				t.Fatalf("failed to append ca certs")
-			}
-
-			creds := credentials.NewTLS(&tls.Config{
-				ServerName:   HOST,
-				Certificates: []tls.Certificate{certificate},
-				RootCAs:      certPool,
+			creds = credentials.NewTLS(&tls.Config{
+				RootCAs: pool,
 			})
 
 			dialOpts := []grpc.DialOption{
 				grpc.WithTransportCredentials(creds),
 				grpc.WithPerRPCCredentials(authCreds),
 			}
-			// Create a connection with the TLS credentials
 
 			conn, err := grpc.Dial(HOST, dialOpts...)
 			if err != nil {
@@ -150,28 +124,11 @@ func createTestClientConn() (*grpc.ClientConn, error) {
 
 	authCreds := Creds{Token: tokenString}
 
-	// Load the client certificates from disk
-	certificate, err := tls.LoadX509KeyPair(testCertPath, testCertKeyPath)
-	if err != nil {
-		return nil, err
-	}
+	pool, _ := x509.SystemCertPool()
+	creds := credentials.NewClientTLSFromCert(pool, "")
 
-	// Create a certificate pool from the certificate authority
-	certPool := x509.NewCertPool()
-	ca, err := ioutil.ReadFile(testCAPath)
-	if err != nil {
-		return nil, err
-	}
-
-	// Append the certificates from the CA
-	if ok := certPool.AppendCertsFromPEM(ca); !ok {
-		return nil, err
-	}
-
-	creds := credentials.NewTLS(&tls.Config{
-		ServerName:   HOST,
-		Certificates: []tls.Certificate{certificate},
-		RootCAs:      certPool,
+	creds = credentials.NewTLS(&tls.Config{
+		RootCAs: pool,
 	})
 
 	dialOpts := []grpc.DialOption{
