@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -39,6 +40,50 @@ var (
 )
 
 type State int32
+
+func (s server) AddProfile(ctx context.Context, in *pb.AddProfileRequest) (*pb.InsertResponse, error) {
+	result, err := s.store.AddProfile(in)
+	if err != nil {
+		log.Printf("ERR: Error Add Profile %s", err.Error())
+		return &pb.InsertResponse{ErrorMessage: err.Error()}, nil
+	}
+	log.Printf("Profile %s Saved", in.Name)
+	return &pb.InsertResponse{Message: result}, nil
+}
+
+func (s server) GetProfiles(ctx context.Context, in *pb.EmptyRequest) (*pb.GetProfilesResp, error){
+	result, err := s.store.GetProfiles()
+	if err != nil {
+		log.Printf("ERR: Error Getting Profiles %s", err.Error())
+		return &pb.GetProfilesResp{ErrorMessage: err.Error()}, nil
+	}
+	type Challenge struct {
+		Tag string `json:"tag"`
+		Name string `json:"name"`
+	}
+	var profiles []*pb.GetProfilesResp_Profile
+	var challenges []Challenge
+	for _, p := range result {
+		var chals []*pb.GetProfilesResp_Profile_Challenge
+		err := json.Unmarshal([]byte(p.Challenges), &challenges)
+		if err != nil {
+			//log.Printf("Error while marshalling: %s", err)
+			return &pb.GetProfilesResp{ErrorMessage: err.Error()}, nil
+		}
+		for _, c := range challenges {
+			//log.Printf("Looping through challenges... Found: %s in profile: %s", c.Name, p.Name)
+			chals = append(chals, &pb.GetProfilesResp_Profile_Challenge{
+				Tag: c.Tag,
+				Name: c.Name,
+			})
+		}
+		profiles = append(profiles, &pb.GetProfilesResp_Profile{
+			Name: p.Name,
+			Challenges: chals,
+		})
+	}
+	return &pb.GetProfilesResp{Profiles: profiles}, nil
+}
 
 func (s server) AddEvent(ctx context.Context, in *pb.AddEventRequest) (*pb.InsertResponse, error) {
 	result, err := s.store.AddEvent(in)

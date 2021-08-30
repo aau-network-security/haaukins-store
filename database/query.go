@@ -29,6 +29,15 @@ var (
 		"last_access timestamp, " +
 		"solved_challenges text);"
 
+	CreateProfilesTable = "CREATE TABLE IF NOT EXISTS Profiles("+
+		"id serial primary key, "+
+		"name varchar (50), "+
+		"challenges text);"
+
+	AddProfileQuery = "INSERT INTO profiles (name, challenges) VALUES ($1, $2)"
+
+	GetProfilesQuery = "SELECT * FROM profiles"
+
 	AddTeamQuery = "INSERT INTO team (tag, event_id, email, name, password, created_at, last_access, solved_challenges)" +
 		"VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
 
