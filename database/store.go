@@ -55,6 +55,8 @@ type Store interface {
 	DelTeam(request *pb.DelTeamRequest) (string, error)
 	AddProfile(request *pb.AddProfileRequest) (string, error)
 	GetProfiles() ([]model.Profile, error)
+	UpdateProfile(request *pb.UpdateProfileRequest) (string, error)
+	DeleteProfile(request *pb.DelProfileRequest) (string, error)
 }
 
 func NewStore(conf *model.Config) (Store, error) {
@@ -421,6 +423,41 @@ func (s *store) GetProfiles() ([]model.Profile, error) {
 		profiles = append(profiles, *profile)
 	}
 	return profiles, nil
+}
+
+func (s *store) UpdateProfile(in *pb.UpdateProfileRequest) (string, error) {
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	type Challenge struct {
+		Tag  string `json:"tag"`
+		Name string `json:"name"`
+	}
+	var challenges []Challenge
+	for _, c := range in.Challenges {
+		challenges = append(challenges, Challenge{
+			Tag:  c.Tag,
+			Name: c.Name,
+		})
+	}
+	challengesDB, _ := json.Marshal(challenges)
+	_, err := s.db.Exec(UpdateProfileQuery, string(challengesDB), in.Name)
+	if err != nil {
+		return "", err
+	}
+
+	return OK, nil
+}
+
+func (s *store) DeleteProfile(in *pb.DelProfileRequest)(string, error){
+	s.m.Lock()
+	defer s.m.Unlock()
+	_, err := s.db.Exec(DeleteProfileQuery, in.Name)
+	if err != nil {
+		return "", err
+	}
+
+	return OK, nil
 }
 
 func parseEvents(rows *sql.Rows) ([]model.Event, error) {

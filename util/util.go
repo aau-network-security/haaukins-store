@@ -85,6 +85,26 @@ func (s server) GetProfiles(ctx context.Context, in *pb.EmptyRequest) (*pb.GetPr
 	return &pb.GetProfilesResp{Profiles: profiles}, nil
 }
 
+func (s server) UpdateProfile(ctx context.Context, in *pb.UpdateProfileRequest) (*pb.UpdateResponse, error) {
+	result, err := s.store.UpdateProfile(in)
+	if err != nil {
+		log.Printf("ERR: Error Update Profile %s", err.Error())
+		return &pb.UpdateResponse{ErrorMessage: err.Error()}, nil
+	}
+	log.Printf("Profile %s Updated", in.Name)
+	return &pb.UpdateResponse{Message: result}, nil
+}
+
+func (s server) DeleteProfile(ctx context.Context, in *pb.DelProfileRequest) (*pb.DelProfileResp, error) {
+	result, err := s.store.DeleteProfile(in)
+	if err != nil {
+		log.Printf("ERR: Error Delete Profile %s", err.Error())
+		return &pb.DelProfileResp{ErrorMessage: err.Error()}, nil
+	}
+	log.Printf("Profile %s Deleted", in.Name)
+	return &pb.DelProfileResp{Message: result}, nil
+}
+
 func (s server) AddEvent(ctx context.Context, in *pb.AddEventRequest) (*pb.InsertResponse, error) {
 	result, err := s.store.AddEvent(in)
 	if err != nil {
