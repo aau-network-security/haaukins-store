@@ -79,6 +79,7 @@ func (s server) GetProfiles(ctx context.Context, in *pb.EmptyRequest) (*pb.GetPr
 		}
 		profiles = append(profiles, &pb.GetProfilesResp_Profile{
 			Name: p.Name,
+			Secret: p.Secret,
 			Challenges: chals,
 		})
 	}

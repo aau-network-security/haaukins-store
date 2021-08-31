@@ -33,6 +33,7 @@ type Team struct {
 type Profile struct {
 	Id         uint
 	Name       string
+	Secret     bool
 	Challenges string
 }
 

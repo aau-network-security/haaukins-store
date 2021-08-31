@@ -32,13 +32,14 @@ var (
 	CreateProfilesTable = "CREATE TABLE IF NOT EXISTS Profiles("+
 		"id serial primary key, "+
 		"name varchar (50), "+
+		"secret boolean, "+
 		"challenges text);"
 
-	AddProfileQuery = "INSERT INTO profiles (name, challenges) VALUES ($1, $2)"
+	AddProfileQuery = "INSERT INTO profiles (name, secret, challenges) VALUES ($1, $2, $3)"
 
 	GetProfilesQuery = "SELECT * FROM profiles ORDER BY id asc"
 
-	UpdateProfileQuery = "UPDATE profiles SET challenges = $1 WHERE name = $2"
+	UpdateProfileQuery = "UPDATE profiles SET secret = $1, challenges = $2 WHERE name = $3"
 
 	DeleteProfileQuery = "DELETE FROM profiles WHERE name = $1"
 

@@ -395,7 +395,7 @@ func (s *store) AddProfile(in *pb.AddProfileRequest) (string, error) {
 	}
 	challengesDB, _ := json.Marshal(challenges)
 	//log.Printf("Adding the following profile to DB: %s \n %s", in.Name, string(challengesDB))
-	_, err := s.db.Exec(AddProfileQuery, in.Name, string(challengesDB))
+	_, err := s.db.Exec(AddProfileQuery, in.Name, in.Secret, string(challengesDB))
 	if err != nil {
 		return "", err
 	}
@@ -416,7 +416,7 @@ func (s *store) GetProfiles() ([]model.Profile, error) {
 	var profiles []model.Profile
 	for rows.Next() {
 		profile := new(model.Profile)
-		err := rows.Scan(&profile.Id, &profile.Name, &profile.Challenges)
+		err := rows.Scan(&profile.Id, &profile.Name, &profile.Secret, &profile.Challenges)
 		if err != nil && !strings.Contains(err.Error(), handleNullConversionError) {
 			return nil, err
 		}
@@ -441,7 +441,7 @@ func (s *store) UpdateProfile(in *pb.UpdateProfileRequest) (string, error) {
 		})
 	}
 	challengesDB, _ := json.Marshal(challenges)
-	_, err := s.db.Exec(UpdateProfileQuery, string(challengesDB), in.Name)
+	_, err := s.db.Exec(UpdateProfileQuery, in.Secret, string(challengesDB), in.Name)
 	if err != nil {
 		return "", err
 	}
