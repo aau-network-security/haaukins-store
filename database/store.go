@@ -381,6 +381,23 @@ func (s *store) DropEvent(in *pb.DropEventReq) (bool, error) {
 func (s *store) AddProfile(in *pb.AddProfileRequest) (string, error) {
 	s.m.Lock()
 	defer s.m.Unlock()
+	var rows *sql.Rows
+	var err error
+	//Check if profile exists
+	var exists bool
+	rows, err = s.db.Query(CheckProfileExistsQuery, in.Name)
+	if err != nil {
+		return "", fmt.Errorf("query checking if profile exists err %v", err)
+	}
+	for rows.Next() {
+		err := rows.Scan(&exists)
+		if err != nil && !strings.Contains(err.Error(), handleNullConversionError) {
+			return "", err
+		}
+	}
+	if exists {
+		return "", fmt.Errorf("Secret profile with name \"%s\" already exists", in.Name)
+	}
 
 	type Challenge struct {
 		Tag  string `json:"tag"`
@@ -395,7 +412,7 @@ func (s *store) AddProfile(in *pb.AddProfileRequest) (string, error) {
 	}
 	challengesDB, _ := json.Marshal(challenges)
 	//log.Printf("Adding the following profile to DB: %s \n %s", in.Name, string(challengesDB))
-	_, err := s.db.Exec(AddProfileQuery, in.Name, in.Secret, string(challengesDB))
+	_, err = s.db.Exec(AddProfileQuery, in.Name, in.Secret, string(challengesDB))
 	if err != nil {
 		return "", err
 	}

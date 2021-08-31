@@ -43,6 +43,8 @@ var (
 
 	DeleteProfileQuery = "DELETE FROM profiles WHERE name = $1"
 
+	CheckProfileExistsQuery = "SELECT EXISTS(SELECT 1 FROM profiles WHERE name = $1);"
+
 	AddTeamQuery = "INSERT INTO team (tag, event_id, email, name, password, created_at, last_access, solved_challenges)" +
 		"VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
 
