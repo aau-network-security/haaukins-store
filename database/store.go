@@ -411,7 +411,6 @@ func (s *store) AddProfile(in *pb.AddProfileRequest) (string, error) {
 		})
 	}
 	challengesDB, _ := json.Marshal(challenges)
-	//log.Printf("Adding the following profile to DB: %s \n %s", in.Name, string(challengesDB))
 	_, err = s.db.Exec(AddProfileQuery, in.Name, in.Secret, string(challengesDB))
 	if err != nil {
 		return "", err

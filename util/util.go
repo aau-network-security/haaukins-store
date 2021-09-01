@@ -26,7 +26,7 @@ type server struct {
 }
 
 type certificate struct {
-	cPath    string
+	cPath    s/tring
 	cKeyPath string
 	caPath   string
 }
@@ -67,11 +67,9 @@ func (s server) GetProfiles(ctx context.Context, in *pb.EmptyRequest) (*pb.GetPr
 		var chals []*pb.GetProfilesResp_Profile_Challenge
 		err := json.Unmarshal([]byte(p.Challenges), &challenges)
 		if err != nil {
-			//log.Printf("Error while marshalling: %s", err)
 			return &pb.GetProfilesResp{ErrorMessage: err.Error()}, nil
 		}
 		for _, c := range challenges {
-			//log.Printf("Looping through challenges... Found: %s in profile: %s", c.Name, p.Name)
 			chals = append(chals, &pb.GetProfilesResp_Profile_Challenge{
 				Tag: c.Tag,
 				Name: c.Name,
