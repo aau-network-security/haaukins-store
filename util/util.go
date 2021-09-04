@@ -26,7 +26,7 @@ type server struct {
 }
 
 type certificate struct {
-	cPath    s/tring
+	cPath    string
 	cKeyPath string
 	caPath   string
 }
