@@ -26,5 +26,10 @@ func createTables(db *sql.DB) (string, error) {
 		return "", err
 	}
 
+	//Create Profiles Table
+	if _, err := db.Query(CreateProfilesTable); err != nil {
+		return "", err
+	}
+
 	return OK, nil
 }
