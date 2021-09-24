@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -39,6 +40,69 @@ var (
 )
 
 type State int32
+
+func (s server) AddProfile(ctx context.Context, in *pb.AddProfileRequest) (*pb.InsertResponse, error) {
+	result, err := s.store.AddProfile(in)
+	if err != nil {
+		log.Printf("ERR: Error Add Profile %s", err.Error())
+		return &pb.InsertResponse{ErrorMessage: err.Error()}, nil
+	}
+	log.Printf("Profile %s Saved", in.Name)
+	return &pb.InsertResponse{Message: result}, nil
+}
+
+func (s server) GetProfiles(ctx context.Context, in *pb.EmptyRequest) (*pb.GetProfilesResp, error){
+	result, err := s.store.GetProfiles()
+	if err != nil {
+		log.Printf("ERR: Error Getting Profiles %s", err.Error())
+		return &pb.GetProfilesResp{ErrorMessage: err.Error()}, nil
+	}
+	type Challenge struct {
+		Tag string `json:"tag"`
+		Name string `json:"name"`
+	}
+	var profiles []*pb.GetProfilesResp_Profile
+	var challenges []Challenge
+	for _, p := range result {
+		var chals []*pb.GetProfilesResp_Profile_Challenge
+		err := json.Unmarshal([]byte(p.Challenges), &challenges)
+		if err != nil {
+			return &pb.GetProfilesResp{ErrorMessage: err.Error()}, nil
+		}
+		for _, c := range challenges {
+			chals = append(chals, &pb.GetProfilesResp_Profile_Challenge{
+				Tag: c.Tag,
+				Name: c.Name,
+			})
+		}
+		profiles = append(profiles, &pb.GetProfilesResp_Profile{
+			Name: p.Name,
+			Secret: p.Secret,
+			Challenges: chals,
+		})
+	}
+	return &pb.GetProfilesResp{Profiles: profiles}, nil
+}
+
+func (s server) UpdateProfile(ctx context.Context, in *pb.UpdateProfileRequest) (*pb.UpdateResponse, error) {
+	result, err := s.store.UpdateProfile(in)
+	if err != nil {
+		log.Printf("ERR: Error Update Profile %s", err.Error())
+		return &pb.UpdateResponse{ErrorMessage: err.Error()}, nil
+	}
+	log.Printf("Profile %s Updated", in.Name)
+	return &pb.UpdateResponse{Message: result}, nil
+}
+
+func (s server) DeleteProfile(ctx context.Context, in *pb.DelProfileRequest) (*pb.DelProfileResp, error) {
+	result, err := s.store.DeleteProfile(in)
+	if err != nil {
+		log.Printf("ERR: Error Delete Profile %s", err.Error())
+		return &pb.DelProfileResp{ErrorMessage: err.Error()}, nil
+	}
+	log.Printf("Profile %s Deleted", in.Name)
+	return &pb.DelProfileResp{Message: result}, nil
+}
 
 func (s server) AddEvent(ctx context.Context, in *pb.AddEventRequest) (*pb.InsertResponse, error) {
 	result, err := s.store.AddEvent(in)

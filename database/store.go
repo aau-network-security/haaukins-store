@@ -53,6 +53,10 @@ type Store interface {
 	UpdateExercises(req *pb.UpdateExerciseRequest) (string, error)
 	UpdateCloseEvent(*pb.UpdateEventRequest) (string, error)
 	DelTeam(request *pb.DelTeamRequest) (string, error)
+	AddProfile(request *pb.AddProfileRequest) (string, error)
+	GetProfiles() ([]model.Profile, error)
+	UpdateProfile(request *pb.UpdateProfileRequest) (string, error)
+	DeleteProfile(request *pb.DelProfileRequest) (string, error)
 }
 
 func NewStore(conf *model.Config) (Store, error) {
@@ -372,6 +376,104 @@ func (s *store) DropEvent(in *pb.DropEventReq) (bool, error) {
 	}
 	return false, fmt.Errorf("either no such an event or something else happened")
 
+}
+
+func (s *store) AddProfile(in *pb.AddProfileRequest) (string, error) {
+	s.m.Lock()
+	defer s.m.Unlock()
+	var rows *sql.Rows
+	var err error
+	//Check if profile exists
+	var exists bool
+	rows, err = s.db.Query(CheckProfileExistsQuery, in.Name)
+	if err != nil {
+		return "", fmt.Errorf("query checking if profile exists err %v", err)
+	}
+	for rows.Next() {
+		err := rows.Scan(&exists)
+		if err != nil && !strings.Contains(err.Error(), handleNullConversionError) {
+			return "", err
+		}
+	}
+	if exists {
+		return "", fmt.Errorf("Secret profile with name \"%s\" already exists", in.Name)
+	}
+
+	type Challenge struct {
+		Tag  string `json:"tag"`
+		Name string `json:"name"`
+	}
+	var challenges []Challenge
+	for _, c := range in.Challenges {
+		challenges = append(challenges, Challenge{
+			Tag:  c.Tag,
+			Name: c.Name,
+		})
+	}
+	challengesDB, _ := json.Marshal(challenges)
+	_, err = s.db.Exec(AddProfileQuery, in.Name, in.Secret, string(challengesDB))
+	if err != nil {
+		return "", err
+	}
+
+	return OK, nil
+}
+
+func (s *store) GetProfiles() ([]model.Profile, error) {
+	var rows *sql.Rows
+	var err error
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	rows, err = s.db.Query(GetProfilesQuery)
+	if err != nil {
+		return nil, fmt.Errorf("query getting profiles err %v", err)
+	}
+	var profiles []model.Profile
+	for rows.Next() {
+		profile := new(model.Profile)
+		err := rows.Scan(&profile.Id, &profile.Name, &profile.Secret, &profile.Challenges)
+		if err != nil && !strings.Contains(err.Error(), handleNullConversionError) {
+			return nil, err
+		}
+		profiles = append(profiles, *profile)
+	}
+	return profiles, nil
+}
+
+func (s *store) UpdateProfile(in *pb.UpdateProfileRequest) (string, error) {
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	type Challenge struct {
+		Tag  string `json:"tag"`
+		Name string `json:"name"`
+	}
+	var challenges []Challenge
+	for _, c := range in.Challenges {
+		challenges = append(challenges, Challenge{
+			Tag:  c.Tag,
+			Name: c.Name,
+		})
+	}
+	challengesDB, _ := json.Marshal(challenges)
+	_, err := s.db.Exec(UpdateProfileQuery, in.Secret, string(challengesDB), in.Name)
+	if err != nil {
+		return "", err
+	}
+
+	return OK, nil
+}
+
+func (s *store) DeleteProfile(in *pb.DelProfileRequest)(string, error){
+	s.m.Lock()
+	defer s.m.Unlock()
+	_, err := s.db.Exec(DeleteProfileQuery, in.Name)
+	if err != nil {
+		return "", err
+	}
+
+	return OK, nil
 }
 
 func parseEvents(rows *sql.Rows) ([]model.Event, error) {

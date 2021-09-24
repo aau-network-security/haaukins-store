@@ -30,6 +30,13 @@ type Team struct {
 	SolvedChallenges string
 }
 
+type Profile struct {
+	Id         uint
+	Name       string
+	Secret     bool
+	Challenges string
+}
+
 type Config struct {
 	Host      string `yaml:"host"`
 	AuthKey   string `yaml:"auth-key"`
