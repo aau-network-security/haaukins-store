@@ -57,7 +57,7 @@ func insertTeamEvent(eid int, db *sql.DB) error {
 }
 
 func insertFakeEvent(event fakeEvent, db *sql.DB) error {
-	_, err := db.Exec(AddEventQuery, event.tag, "", event.available, event.capacity, "kali", 1, "ftp,sql", event.sT.UTC(), event.fT.UTC(), time.Date(0001, 01, 01, 00, 00, 00, 0000, time.UTC).Format(time.RFC3339), "tester", false, "", "")
+	_, err := db.Exec(AddEventQuery, event.tag, "", event.available, event.capacity, "kali", 1, "ftp,sql", event.sT.UTC(), event.fT.UTC(), time.Date(0001, 01, 01, 00, 00, 00, 0000, time.UTC).Format(time.RFC3339), "tester", 0, "", "")
 	if err != nil {
 		return err
 	}
