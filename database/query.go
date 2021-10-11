@@ -29,10 +29,10 @@ var (
 		"last_access timestamp, " +
 		"solved_challenges text);"
 
-	CreateProfilesTable = "CREATE TABLE IF NOT EXISTS Profiles("+
-		"id serial primary key, "+
-		"name varchar (50), "+
-		"secret boolean, "+
+	CreateProfilesTable = "CREATE TABLE IF NOT EXISTS Profiles(" +
+		"id serial primary key, " +
+		"name varchar (50), " +
+		"secret boolean, " +
 		"challenges text);"
 
 	AddProfileQuery = "INSERT INTO profiles (name, secret, challenges) VALUES ($1, $2, $3)"
@@ -63,8 +63,8 @@ var (
 	QuerySolvedChls = "SELECT solved_challenges FROM team WHERE tag=$1"
 	QueryEventTable = "SELECT * FROM event"
 
-	// finished_at '0001-01-01 00:00:00 means event does not finished yet '
-	QueryEventId    = "SELECT id FROM event WHERE tag=$1 and finished_at = date('0001-01-01 00:00:00'); "
+	// query only running, suspended and booked events
+	QueryEventId    = "SELECT id FROM event WHERE tag=$1 and finished_at = date('0001-01-01 00:00:00') and (status = 0 or status = 1 or status = 2)"
 	QueryEventTeams = "SELECT * FROM team WHERE event_id=$1"
 	QueryTeamCount  = "SELECT count(team.id) FROM team WHERE team.event_id=$1"
 
