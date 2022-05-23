@@ -7,11 +7,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
 
       - name: Publish Server to Github Registry
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v3
         with:
           repository: aau-network-security/haaukins-store/server
           username: ${{ github.actor }}
@@ -21,7 +21,7 @@ jobs:
           tag_with_sha: true
 
       - name: Publish server to dockerhub
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v3
         with:
           repository: aaunetworksecurity/haaukins-store
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -42,12 +42,9 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        uses: ncipollo/release-action@v1.10.0
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body_path: ./changelog.txt
-          draft: false
-          prerelease: false
+          tag: ${{ github.ref }}
+          name: Release ${{ github.ref }}
+          bodyFile: ./changelog.txt
+          token: ${{ secrets.GITHUB_TOKEN }}
