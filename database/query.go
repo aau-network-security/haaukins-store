@@ -64,7 +64,7 @@ var (
 	QueryEventTable = "SELECT * FROM event"
 
 	// query only running, suspended and booked events
-	QueryEventId    = "SELECT id FROM event WHERE tag=$1 and finished_at = date('0001-01-01 00:00:00') and (status = 0 or status = 1 or status = 2)"
+	QueryEventId    = "SELECT id FROM event WHERE tag=$1 and finished_at = date('0001-01-01 00:00:00') and status!=3"
 	QueryEventTeams = "SELECT * FROM team WHERE event_id=$1"
 	QueryTeamCount  = "SELECT count(team.id) FROM team WHERE team.event_id=$1"
 
