@@ -2,16 +2,13 @@ version: '3'
 services:
   server:
     container_name: server
-    env_file:
-      - .env
     build: .
     ports:
-      - 50051:50051
+      - "50051:50051"
     restart: on-failure
     depends_on:
       - postgres-db
     volumes:
-      - ${CERTS_PATH}:/certs:ro  # in production, change this CERTS_PATH to your certificate files folder
       - ${CONFIG_PATH}:/config.yml:ro  # mount config file
     networks:
       - internal
@@ -20,8 +17,10 @@ services:
     image: postgres:alpine
     container_name: postgres
     command: postgres
-    env_file:
-      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB} # database name
+      POSTGRES_USER: ${POSTGRES_USER} # database user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # database password
     ports:
       - '5432:5432'
     volumes:
