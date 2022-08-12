@@ -41,9 +41,9 @@ jobs:
 
       - name: Download certs
         run: |
-          curl -o haaukins-store.com.crt https://gist.githubusercontent.com/mrtrkmn/da480dd97f74c7a9581d6a69d5b2e984/raw/cbc2e338800d81a904c320999e44ec38b721ff5c/haaukins-store.com.crt
-          curl -o localhost_50051.key    https://gist.githubusercontent.com/mrtrkmn/12132d60247e24041b954ee43d5e5cb1/raw/f18d0f0f96539fb424d1c463ec7e60ae8f846d0c/localhost_50051.key
-          curl -o localhost_50051.crt    https://gist.githubusercontent.com/mrtrkmn/fc57419e46a859a031e11aa10b97c9e1/raw/109b1e64340c7394dcd9f7295969659d3cbc72af/localhost_50051.crt
+          curl -o haaukins-store.com.crt https://gitlab.com/-/snippets/2352549/raw/main/haaukins-store.com.crt
+          curl -o localhost_50051.key    https://gitlab.com/-/snippets/2352547/raw/main/localhost_50051.key
+          curl -o localhost_50051.crt    https://gitlab.com/-/snippets/2352548/raw/main/localhost_50051.crt
 
       - name: Get dependencies
         run: |
